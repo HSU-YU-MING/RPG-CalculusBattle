@@ -47,7 +47,7 @@ const STORY = {
     ],
   },
   ch1_class: {
-    chapter: 1, bg: "class", speaker: "微積分教授",
+    chapter: 1, bg: "class", img: "教室上課.png", speaker: "微積分教授",
     text: "「同學，極限是微積分的地基。」教授在黑板寫下一排符號。\n「下週五，小考，考極限與基本微分。會當人喔。」\n你默默把這句話抄進筆記。",
     next: "ch1_meet",
   },
@@ -66,22 +66,22 @@ const STORY = {
     ],
   },
   ch1_lib: {
-    chapter: 1, bg: "library", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 1, bg: "library", img: "白天圖書館.png", speaker: "旁白",
     text: "圖書館裡，你和阿哲把極限的 ε-δ 定義啃了一遍。\n雖然頭很痛，但「sin x / x」這類題目你已經有手感了。",
     next: "ch1_night",
   },
   ch1_senior: {
-    chapter: 1, bg: "library", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 1, bg: "library", img: "白天圖書館.png", speaker: "旁白",
     text: "你翻開求生包裡學姐留下的筆記，重點都畫好了，連公式小抄都附了一張。\n一個人讀雖然有點悶，但也算把極限的觀念摸熟了。",
     next: "ch1_night",
   },
   ch1_game: {
-    chapter: 1, bg: "dorm", speaker: "旁白",
+    chapter: 1, bg: "dorm", img: "宿舍打電動耍廢的夜景.png", speaker: "旁白",
     text: "「一場就好」變成「最後一場」，最後一場又變成天亮。\n微積分？那是什麼，能吃嗎？",
     next: "ch1_night",
   },
   ch1_night: {
-    chapter: 1, bg: "night", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 1, bg: "night", img: "熬夜讀書.jpg", speaker: "旁白",
     text: "小考前一晚。書桌上的講義攤開著，你的眼皮也在打架。\n最後衝刺，你選擇——",
     choices: [
       { text: "熬夜把例題狂算一遍（衝準備度，但會疲勞）", points: 14, fatigue: 12, next: "ch1_exam" },
@@ -125,7 +125,7 @@ const STORY = {
     next: "ch2_group",
   },
   ch2_group: {
-    chapter: 2, bg: "class", speaker: "微積分教授",
+    chapter: 2, bg: "class", img: "教授講期中.png", speaker: "微積分教授",
     text: "「期中考佔學期成績很重。另外，這週的分組作業也要交。」\n作業和讀書時間互相擠壓，你決定——",
     choices: [
       { text: "認真做作業，順便把範圍讀熟", points: 18, flag: "diligent", next: "ch2_studygroup" },
@@ -134,12 +134,12 @@ const STORY = {
     ],
   },
   ch2_studygroup: {
-    chapter: 2, bg: "library", img: "熬夜讀書.png", speaker: "阿哲",
+    chapter: 2, bg: "library", img: "白天讀書會.png", speaker: "阿哲",
     text: "你想起求生包裡那份歷年考古題，把它攤開來研究。\n「題型好像有跡可循耶！」阿哲湊過來一起看。",
     next: "ch2_method",
   },
   ch2_method: {
-    chapter: 2, bg: "library", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 2, bg: "library", img: "白天圖書館.png", speaker: "旁白",
     text: "距離期中考剩三天。你的讀書策略是？",
     choices: [
       { text: "弄懂觀念，每種題型都親手算過", points: 17, next: "ch2_night" },
@@ -148,7 +148,7 @@ const STORY = {
     ],
   },
   ch2_night: {
-    chapter: 2, bg: "night", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 2, bg: "night", img: "圖書館熬夜圖書.jpg", speaker: "旁白",
     text: "期中考前夜，凌晨兩點。你還在跟一題分部積分搏鬥，睏意排山倒海。",
     choices: [
       { text: "再讀一小時就睡，適度衝刺", points: 9, fatigue: 6, next: "ch2_exam" },
@@ -157,7 +157,7 @@ const STORY = {
     ],
   },
   ch2_exam: {
-    chapter: 2, type: "exam", scoreKey: "mid", bg: "exam", img: "小考_0.png",
+    chapter: 2, type: "exam", scoreKey: "mid", bg: "exam", img: "考期中考時.png",
     intro: "期中考登場！這次題目更硬，記得善用道具與公式小抄。",
     questions: [
       { q: "∫ 2x dx = ？", opts: ["x² + C", "2 + C", "x + C", "2x² + C"], answer: 0, points: 8,
@@ -175,7 +175,7 @@ const STORY = {
     chapter: 2, type: "branch", on: "lastScore", bg: "campus",
     cases: [
       { min: 75, speaker: "旁白", img: "期中考及格.png", text: "走出考場，你長舒一口氣。那些難題你大多扛住了。\n阿哲衝過來抱住你：「兄弟你是我看過最猛的！」期末，穩住就贏。" },
-      { min: 50, speaker: "旁白", img: "小考_0.png", text: "期中考有寫完，但有幾題不太確定。成績應該是中段班。\n期末是最後的翻身機會，不能再失分了。" },
+      { min: 50, speaker: "旁白", img: "考期中考時.png", text: "期中考有寫完，但有幾題不太確定。成績應該是中段班。\n期末是最後的翻身機會，不能再失分了。" },
       { min: 0,  speaker: "阿哲", img: "期中考不及格.png", text: "「欸……你還好嗎？臉好白。」期中考你被電慘了。\n系統寄來一封信：學業預警通知。期末若再不及格，這科就掰了。" },
     ],
     next: "ch2_save",
@@ -192,7 +192,7 @@ const STORY = {
     next: "ch3_plan",
   },
   ch3_plan: {
-    chapter: 3, bg: "library", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 3, bg: "library", img: "白天圖書館.png", speaker: "旁白",
     text: "期末範圍包山包海。你怎麼規劃這最後一週？",
     choices: [
       { text: "排讀書計畫，從頭到尾系統複習", points: 20, flag: "planned", next: "ch3_temple" },
@@ -209,7 +209,7 @@ const STORY = {
     ],
   },
   ch3_cafe: {
-    chapter: 3, bg: "library", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 3, bg: "library", img: "白天咖啡廳.png", speaker: "旁白",
     text: "考前最後一個下午，你在咖啡廳做最後衝刺。店員問要不要續杯。",
     choices: [
       { text: "拼了，多趕一點進度", points: 11, fatigue: 6, next: "ch3_final_night" },
@@ -217,7 +217,7 @@ const STORY = {
     ],
   },
   ch3_final_night: {
-    chapter: 3, bg: "night", img: "熬夜讀書.png", speaker: "旁白",
+    chapter: 3, bg: "night", img: "咖啡廳熬夜讀書.jpg", speaker: "旁白",
     text: "期末考前夜。一學期的辛苦、翹過的課、熬過的夜，全部濃縮在明天那張考卷上。\n你闔上講義，深吸一口氣。",
     choices: [
       { text: "我準備好了，睡飽再戰", points: 9, flag: "rested", next: "ch3_exam" },
