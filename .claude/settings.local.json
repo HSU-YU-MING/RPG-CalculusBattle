@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node --check js/story.js)",
+      "Bash(node --check js/game.js)",
+      "PowerShell(Start-Process \"d:\\\\16+2 VC\\\\RPG\\\\index.html\")",
+      "PowerShell(\"opened\")"
+    ]
+  }
+}

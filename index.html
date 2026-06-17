@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>駱是能重來 — 微積分大作戰</title>
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== 大廳 LOBBY ===== -->
+    <section id="lobby" class="screen active">
+      <div class="lobby-inner">
+        <div class="title-block">
+          <h1 class="game-title"><span class="hl">駱</span>是能重來</h1>
+          <p class="game-subtitle">微積分大作戰 · 一個大學生的求生劇本</p>
+        </div>
+        <nav class="menu">
+          <button class="menu-btn" data-action="new-game">▶ 新遊戲</button>
+          <button class="menu-btn" id="continue-btn" data-action="continue">⏷ 繼續遊戲</button>
+          <button class="menu-btn" data-action="inventory">🎒 我的道具</button>
+          <button class="menu-btn" data-action="how">❔ 玩法說明</button>
+        </nav>
+        <p class="save-hint" id="save-hint"></p>
+        <footer class="lobby-footer">三個章節 · 三場考試 · 你的選擇決定能不能過這堂課</footer>
+      </div>
+    </section>
+
+    <!-- ===== 遊戲畫面 GAME ===== -->
+    <section id="game" class="screen">
+      <header class="hud">
+        <div class="hud-left">
+          <span class="hud-chapter" id="hud-chapter">第一章</span>
+          <span class="hud-course" id="hud-course">微積分</span>
+        </div>
+        <div class="hud-right">
+          <span class="hud-stat" id="hud-prep" title="本章準備度">📈 準備度 <b>0</b></span>
+          <span class="hud-stat hud-fatigue" id="hud-fatigue" title="熬夜疲勞，會在考試時扣分"></span>
+          <button class="hud-btn" id="hud-bag" title="查看道具">🎒 <b id="hud-bagcount">0</b></button>
+          <button class="hud-btn" id="hud-menu" title="回大廳">≡</button>
+        </div>
+      </header>
+
+      <div class="stage" id="stage">
+        <div class="scene-bg" id="scene-bg"></div>
+        <div class="dialogue-wrap">
+          <div class="speaker" id="speaker"></div>
+          <div class="dialogue" id="dialogue"></div>
+          <div class="choices" id="choices"></div>
+          <div class="continue-tip" id="continue-tip">▾ 點擊繼續</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 結算畫面 RESULT ===== -->
+    <section id="result" class="screen">
+      <div class="result-inner">
+        <h2 class="result-verdict" id="result-verdict"></h2>
+        <div class="result-scores" id="result-scores"></div>
+        <p class="result-avg" id="result-avg"></p>
+        <p class="result-story" id="result-story"></p>
+        <div class="result-actions">
+          <button class="menu-btn" data-action="to-lobby">回大廳</button>
+          <button class="menu-btn" data-action="new-game">再玩一次</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== 彈窗 MODAL ===== -->
+    <div id="modal" class="modal">
+      <div class="modal-box">
+        <h3 id="modal-title"></h3>
+        <div id="modal-body"></div>
+        <button class="modal-close" id="modal-close">關閉</button>
+      </div>
+    </div>
+
+    <!-- ===== 飄分提示 TOAST ===== -->
+    <div id="toast" class="toast"></div>
+
+  </div>
+
+  <script src="js/story.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
