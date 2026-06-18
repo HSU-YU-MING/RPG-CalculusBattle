@@ -81,7 +81,7 @@ const STORY = {
     next: "ch1_night",
   },
   ch1_night: {
-    chapter: 1, bg: "night", img: "熬夜讀書.jpg", speaker: "旁白",
+    chapter: 1, bg: "night", img: "熬夜讀書.png", speaker: "旁白",
     text: "小考前一晚。書桌上的講義攤開著，你的眼皮也在打架。\n最後衝刺，你選擇——",
     choices: [
       { text: "熬夜把例題狂算一遍（衝準備度，但會疲勞）", points: 14, fatigue: 12, next: "ch1_exam" },
@@ -114,7 +114,7 @@ const STORY = {
     next: "ch1_save",
   },
   ch1_save: {
-    chapter: 1, type: "save", next: "ch2_intro",
+    chapter: 1, type: "save", img: "封面.png", next: "ch2_intro",
     text: "── 第一章 結束。進度已存檔。 ──",
   },
 
@@ -148,7 +148,7 @@ const STORY = {
     ],
   },
   ch2_night: {
-    chapter: 2, bg: "night", img: "圖書館熬夜圖書.jpg", speaker: "旁白",
+    chapter: 2, bg: "night", img: "熬夜讀書.png", speaker: "旁白",
     text: "期中考前夜，凌晨兩點。你還在跟一題分部積分搏鬥，睏意排山倒海。",
     choices: [
       { text: "再讀一小時就睡，適度衝刺", points: 9, fatigue: 6, next: "ch2_exam" },
@@ -181,7 +181,7 @@ const STORY = {
     next: "ch2_save",
   },
   ch2_save: {
-    chapter: 2, type: "save", next: "ch3_intro",
+    chapter: 2, type: "save", img: "封面.png", next: "ch3_intro",
     text: "── 第二章 結束。進度已存檔。 ──",
   },
 
@@ -217,7 +217,7 @@ const STORY = {
     ],
   },
   ch3_final_night: {
-    chapter: 3, bg: "night", img: "咖啡廳熬夜讀書.jpg", speaker: "旁白",
+    chapter: 3, bg: "night", img: "熬夜讀書.png", speaker: "旁白",
     text: "期末考前夜。一學期的辛苦、翹過的課、熬過的夜，全部濃縮在明天那張考卷上。\n你闔上講義，深吸一口氣。",
     choices: [
       { text: "我準備好了，睡飽再戰", points: 9, flag: "rested", next: "ch3_exam" },
