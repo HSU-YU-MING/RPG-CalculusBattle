@@ -25,6 +25,68 @@ const STARTING_ITEMS = ["notes", "past_exam", "charm", "energy", "coffee", "form
 // 每場考試最多可使用的道具數量（含加分、消疲勞、公式小抄）。
 const EXAM_ITEM_LIMIT = 2;
 
+// 每題分數依難度而定（小考較好拿、期末較硬）。
+const POINTS_BY_DIFFICULTY = { easy: 8, medium: 8, hard: 9 };
+
+/* 題庫：依難度分組，考試時隨機抽題、選項也會打亂。
+   easy=小考（極限與基本微分）／medium=期中（積分與微分技巧）／hard=期末（定積分、連鎖律、乘積律）。 */
+const QUESTION_BANK = {
+  easy: [
+    { q: "lim(x→0) sin(x) / x = ？", opts: ["0", "1", "∞", "不存在"], answer: 1,
+      hint: "著名極限：x→0 時 sin x 與 x 幾乎相等，比值趨近 1。" },
+    { q: "d/dx ( x² ) = ？", opts: ["x", "2x", "x²", "2"], answer: 1,
+      hint: "冪次規則：d/dx xⁿ = n·xⁿ⁻¹。" },
+    { q: "d/dx ( 3x + 1 ) = ？", opts: ["3", "1", "3x", "0"], answer: 0,
+      hint: "x 的係數保留，常數項微分後為 0。" },
+    { q: "lim(x→2) (x² − 4)/(x − 2) = ？", opts: ["0", "2", "4", "不存在"], answer: 2,
+      hint: "因式分解 x²−4=(x−2)(x+2)，約掉後代入 x=2。" },
+    { q: "d/dx ( 5 ) = ？", opts: ["5", "1", "0", "x"], answer: 2,
+      hint: "常數的微分恆為 0。" },
+    { q: "d/dx ( x³ ) = ？", opts: ["3x²", "x²", "3x", "x⁴/4"], answer: 0,
+      hint: "冪次規則：把指數 3 拉到前面，指數減 1。" },
+    { q: "lim(x→3) ( x + 2 ) = ？", opts: ["3", "5", "2", "不存在"], answer: 1,
+      hint: "連續函數直接代入 x=3。" },
+    { q: "d/dx ( x ) = ？", opts: ["0", "x", "1", "2x"], answer: 2,
+      hint: "x 的斜率固定為 1。" },
+  ],
+  medium: [
+    { q: "∫ 2x dx = ？", opts: ["x² + C", "2 + C", "x + C", "2x² + C"], answer: 0,
+      hint: "反冪次規則：∫xⁿ dx = xⁿ⁺¹/(n+1) + C。" },
+    { q: "d/dx ( sin x ) = ？", opts: ["cos x", "−cos x", "−sin x", "tan x"], answer: 0,
+      hint: "sin 的導數是 cos。" },
+    { q: "d/dx ( eˣ ) = ？", opts: ["eˣ", "x·eˣ⁻¹", "1", "ln x"], answer: 0,
+      hint: "eˣ 微分後仍是 eˣ。" },
+    { q: "∫ 1 dx = ？", opts: ["x + C", "1 + C", "0", "C"], answer: 0,
+      hint: "常數 1 的積分是 x（別忘了 +C）。" },
+    { q: "d/dx ( cos x ) = ？", opts: ["sin x", "−sin x", "cos x", "−cos x"], answer: 1,
+      hint: "cos 的導數是 −sin（注意負號）。" },
+    { q: "∫ x² dx = ？", opts: ["x³/3 + C", "2x + C", "x³ + C", "3x² + C"], answer: 0,
+      hint: "反冪次：指數 +1 再除以新指數。" },
+    { q: "d/dx ( ln x ) = ？", opts: ["1/x", "ln x", "x", "−1/x²"], answer: 0,
+      hint: "ln x 的導數是 1/x。" },
+    { q: "∫ eˣ dx = ？", opts: ["eˣ + C", "x·eˣ + C", "eˣ⁺¹ + C", "ln x + C"], answer: 0,
+      hint: "eˣ 積分後仍是 eˣ。" },
+  ],
+  hard: [
+    { q: "∫₀¹ x dx = ？", opts: ["1", "1/2", "0", "2"], answer: 1,
+      hint: "∫x dx = x²/2，代入上限 1、下限 0 相減。" },
+    { q: "lim(x→∞) 1/x = ？", opts: ["∞", "1", "0", "−1"], answer: 2,
+      hint: "分母越來越大，整體趨近 0。" },
+    { q: "∫₀² 3 dx = ？", opts: ["3", "6", "2", "9"], answer: 1,
+      hint: "常數定積分 = 常數 × 區間長度 = 3 × 2。" },
+    { q: "d/dx ( x·eˣ ) = ？", opts: ["eˣ", "(1 + x)eˣ", "x·eˣ", "eˣ − x"], answer: 1,
+      hint: "乘積律：(uv)' = u'v + uv' = eˣ + x·eˣ。" },
+    { q: "∫₀^π sin x dx = ？", opts: ["0", "1", "2", "π"], answer: 2,
+      hint: "∫sin x dx = −cos x，−cos π+cos 0 = 1+1 = 2。" },
+    { q: "lim(x→0) (1 − cos x)/x = ？", opts: ["0", "1", "1/2", "∞"], answer: 0,
+      hint: "分子比分母更快趨近 0，極限為 0。" },
+    { q: "∫₁^e (1/x) dx = ？", opts: ["1", "e", "e − 1", "0"], answer: 0,
+      hint: "∫(1/x)dx = ln x，ln e − ln 1 = 1 − 0 = 1。" },
+    { q: "d/dx ( sin 2x ) = ？", opts: ["cos 2x", "2 cos 2x", "−2 cos 2x", "2 sin 2x"], answer: 1,
+      hint: "連鎖律：外層 cos 2x 乘上內層導數 2。" },
+  ],
+};
+
 const STORY = {
   meta: { course: "微積分", title: "駱是能重來" },
 
@@ -91,17 +153,8 @@ const STORY = {
   },
   ch1_exam: {
     chapter: 1, type: "exam", scoreKey: "quiz", bg: "exam", img: "小考_0.png",
-    intro: "小考開始了！每場考試最多使用 2 件道具：加分/消疲勞道具在作答前用、公式小抄在作答中用。想清楚要不要留好料給後面的大考。",
-    questions: [
-      { q: "lim(x→0) sin(x) / x = ？", opts: ["0", "1", "∞", "不存在"], answer: 1, points: 8,
-        hint: "著名極限：當 x→0 時，sin x 與 x 幾乎相等，比值趨近 1。" },
-      { q: "d/dx ( x² ) = ？", opts: ["x", "2x", "x²", "2"], answer: 1, points: 8,
-        hint: "冪次規則：d/dx xⁿ = n·xⁿ⁻¹。" },
-      { q: "d/dx ( 3x + 1 ) = ？", opts: ["3", "1", "3x", "0"], answer: 0, points: 8,
-        hint: "x 的係數保留，常數項微分後為 0。" },
-      { q: "lim(x→2) (x² − 4)/(x − 2) = ？", opts: ["0", "2", "4", "不存在"], answer: 2, points: 8,
-        hint: "因式分解 x²−4 =(x−2)(x+2)，約掉 (x−2) 後代入 x=2。" },
-    ],
+    intro: "小考開始了！題目為「簡單」難度，從題庫隨機抽 4 題。每場考試最多使用 2 件道具：加分/消疲勞道具在作答前用、公式小抄在作答中用。想清楚要不要留好料給後面的大考。",
+    difficulty: "easy", count: 4,
     next: "ch1_react",
   },
   ch1_react: {
@@ -158,17 +211,8 @@ const STORY = {
   },
   ch2_exam: {
     chapter: 2, type: "exam", scoreKey: "mid", bg: "exam", img: "考期中考時.png",
-    intro: "期中考登場！這次題目更硬，記得善用道具與公式小抄。",
-    questions: [
-      { q: "∫ 2x dx = ？", opts: ["x² + C", "2 + C", "x + C", "2x² + C"], answer: 0, points: 8,
-        hint: "反冪次規則：∫xⁿ dx = xⁿ⁺¹/(n+1) + C。" },
-      { q: "d/dx ( sin x ) = ？", opts: ["cos x", "−cos x", "−sin x", "tan x"], answer: 0, points: 8,
-        hint: "sin 的導數是 cos。" },
-      { q: "d/dx ( eˣ ) = ？", opts: ["eˣ", "x·eˣ⁻¹", "1", "ln x"], answer: 0, points: 8,
-        hint: "eˣ 微分後仍是 eˣ，這是它最招牌的特性。" },
-      { q: "∫ 1 dx = ？", opts: ["x + C", "1 + C", "0", "C"], answer: 0, points: 8,
-        hint: "常數 1 的積分是 x（別忘了加常數 C）。" },
-    ],
+    intro: "期中考登場！題目升到「中等」難度（積分與微分技巧），從題庫隨機抽 4 題。記得善用道具與公式小抄。",
+    difficulty: "medium", count: 4,
     next: "ch2_react",
   },
   ch2_react: {
@@ -226,17 +270,8 @@ const STORY = {
   },
   ch3_exam: {
     chapter: 3, type: "exam", scoreKey: "final", bg: "exam", img: "期末_0.png",
-    intro: "期末考——決勝的一戰！把背包裡的東西都用上吧。",
-    questions: [
-      { q: "∫₀¹ x dx = ？", opts: ["1", "1/2", "0", "2"], answer: 1, points: 9,
-        hint: "∫x dx = x²/2，再代入上限 1 與下限 0 相減。" },
-      { q: "lim(x→∞) 1/x = ？", opts: ["∞", "1", "0", "−1"], answer: 2, points: 9,
-        hint: "分母越來越大，整個分數趨近於 0。" },
-      { q: "d/dx ( cos x ) = ？", opts: ["sin x", "−sin x", "cos x", "−cos x"], answer: 1, points: 9,
-        hint: "cos 的導數是 −sin（注意負號）。" },
-      { q: "∫₀² 3 dx = ？", opts: ["3", "6", "2", "9"], answer: 1, points: 9,
-        hint: "常數的定積分 = 常數 × 區間長度 = 3 × (2−0)。" },
-    ],
+    intro: "期末考——決勝的一戰！題目為「困難」難度（定積分、連鎖律、乘積律），從題庫隨機抽 4 題。把背包裡的東西都用上吧。",
+    difficulty: "hard", count: 4,
     next: "ch3_react",
   },
   ch3_react: {
@@ -272,3 +307,22 @@ function judge(avg) {
     story: "成績單上那個刺眼的數字，宣告了這學期微積分的結局：重修。\n別灰心，很多人都重修過。重點是——下一次，你會怎麼選？",
   };
 }
+
+/* 補考關卡：學期加權平均落在 50–59 時觸發。
+   5 題困難、每題 20 分（滿分 100），可用背包剩下的道具；達 60 分通過（學期成績以 60 計），否則重修。 */
+const MAKEUP_PASS_LINE = 60;
+const MAKEUP_EXAM = {
+  type: "exam", makeup: true, scoreKey: "makeup", bg: "exam", img: "期末_0.png",
+  intro: "補考——最後的救贖機會！這場補考共 5 題（困難難度），每題 20 分。達到 60 分就能低空通過（學期成績以 60 分計），否則就要重修。可使用背包剩下的道具。",
+  difficulty: "hard", count: 5, pointsPerQ: 20,
+};
+const MAKEUP_RESULT = {
+  pass: {
+    cls: "warn", verdict: "補考通過 · 低空過關 🎓",
+    story: "補考那天，你穩穩答完了關鍵題。教授在成績欄填上 60——不漂亮，但你過了。\n這一科總算保住了。記住這次的心驚，下學期別再走到補考這一步。",
+  },
+  fail: {
+    cls: "fail", verdict: "補考未過 · 重修 💀",
+    story: "補考還是沒能跨過那條線。微積分這一科，最終的結局是重修。\n別太自責，你已經拼到最後一刻。重來一次，你會更清楚該怎麼準備。",
+  },
+};

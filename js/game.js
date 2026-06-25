@@ -188,8 +188,28 @@
   // ---- 考試 ----
   let exam = null; // { sc, bonus, qPoints, qIndex }
 
+  // 隨機洗牌（Fisher–Yates）
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+  // 依難度從題庫隨機抽題，並打亂選項順序（pointsOverride 用於補考的高分配題）
+  function pickExamQuestions(difficulty, count, pointsOverride) {
+    const pool = (QUESTION_BANK[difficulty] || []).slice();
+    const pts = pointsOverride || POINTS_BY_DIFFICULTY[difficulty] || 8;
+    return shuffle(pool).slice(0, count).map((q) => {
+      const correctText = q.opts[q.answer];
+      const opts = shuffle(q.opts.slice());
+      return { q: q.q, opts, answer: opts.indexOf(correctText), hint: q.hint, points: pts };
+    });
+  }
+
   function renderExam(sc) {
     exam = { sc, bonus: 0, relief: 0, qPoints: 0, qIndex: -1, used: 0 };
+    exam.questions = sc.questions || pickExamQuestions(sc.difficulty, sc.count || 4, sc.pointsPerQ);
     setBg(sc.bg || "exam", sc.img);
     el.speaker.textContent = "📝 考試";
     const fatigueLine = state.fatigue > 0 ? `　😵 熬夜疲勞：${state.fatigue}（會在成績扣分）` : "";
@@ -263,7 +283,7 @@
 
   function nextExamQuestion() {
     exam.qIndex++;
-    const qs = exam.sc.questions;
+    const qs = exam.questions;
     if (exam.qIndex >= qs.length) return finishExam();
 
     const q = qs[exam.qIndex];
@@ -308,6 +328,7 @@
   }
 
   function finishExam() {
+    if (exam.sc.makeup) return finishMakeup();
     const penalty = Math.max(0, state.fatigue - exam.relief);
     const raw = state.prep + exam.bonus + exam.qPoints - penalty;
     const score = Math.max(0, Math.min(100, raw));
@@ -330,6 +351,47 @@
     el.choices.appendChild(cont);
   }
 
+  // ---- 補考關卡 ----
+  function startMakeup(avg) {
+    show("game");
+    setBg("exam", MAKEUP_EXAM.img);
+    el.continueTip.classList.add("hidden");
+    el.speaker.textContent = "📩 補考通知";
+    el.dialogue.textContent =
+      `學期加權成績 ${avg} 分，落在及格邊緣下方（50–59）。\n` +
+      `系統寄來一封補考通知——這是保住這個學分的最後機會。`;
+    el.choices.innerHTML = "";
+    const cont = document.createElement("button");
+    cont.className = "choice";
+    cont.style.textAlign = "center";
+    cont.style.borderColor = "var(--accent)";
+    cont.innerHTML = "<b>前往補考 ▶</b>";
+    cont.addEventListener("click", () => renderExam(MAKEUP_EXAM));
+    el.choices.appendChild(cont);
+  }
+
+  function finishMakeup() {
+    const score = Math.max(0, Math.min(100, exam.bonus + exam.qPoints));
+    state.makeupScore = score;
+    state.makeupPassed = score >= MAKEUP_PASS_LINE;
+    state.makeupDone = true;
+    updateHud();
+
+    el.speaker.textContent = "📊 補考成績";
+    el.dialogue.textContent =
+      `答題得分 ${exam.qPoints}` + (exam.bonus ? ` ＋ 道具加分 ${exam.bonus}` : "") +
+      ` ＝ 補考成績 ${score} 分\n` +
+      (state.makeupPassed ? `達到 ${MAKEUP_PASS_LINE} 分，補考通過！` : `未達 ${MAKEUP_PASS_LINE} 分……`);
+    el.choices.innerHTML = "";
+    const cont = document.createElement("button");
+    cont.className = "choice";
+    cont.style.textAlign = "center";
+    cont.style.borderColor = "var(--accent)";
+    cont.innerHTML = "<b>看看最終結果 ▶</b>";
+    cont.addEventListener("click", renderEnd);
+    el.choices.appendChild(cont);
+  }
+
   // ---- 結算 ----
   // 學期成績為加權：小考 20% ＋ 期中 35% ＋ 期末 45%
   const WEIGHTS = { quiz: 0.20, mid: 0.35, final: 0.45 };
@@ -339,15 +401,33 @@
     const vals = { quiz: sc.quiz || 0, mid: sc.mid || 0, final: sc.final || 0 };
     const weighted = vals.quiz * WEIGHTS.quiz + vals.mid * WEIGHTS.mid + vals.final * WEIGHTS.final;
     const avg = Math.round(weighted);
-    const res = judge(avg);
+    let res = judge(avg);
 
-    $("result-verdict").textContent = res.verdict;
-    $("result-verdict").className = "result-verdict " + res.cls;
-    $("result-scores").innerHTML =
+    // 補考機制：落在補考區(50–59)且尚未補考 → 先進補考關卡
+    if (res.key === "makeup" && !state.makeupDone) return startMakeup(avg);
+
+    let cards =
       scoreCard("小考", vals.quiz, "20%") +
       scoreCard("期中考", vals.mid, "35%") +
       scoreCard("期末考", vals.final, "45%");
-    $("result-avg").innerHTML = `學期加權總分：<b>${avg}</b> 分　<span style="font-size:14px;color:var(--muted)">（小考 20% ＋ 期中 35% ＋ 期末 45%）</span>`;
+    let avgLine = `學期加權總分：<b>${avg}</b> 分　<span style="font-size:14px;color:var(--muted)">（小考 20% ＋ 期中 35% ＋ 期末 45%）</span>`;
+
+    // 補考結束後覆寫結局
+    if (state.makeupDone) {
+      cards += scoreCard("補考", state.makeupScore, state.makeupPassed ? "通過" : "未過");
+      if (state.makeupPassed) {
+        res = MAKEUP_RESULT.pass;
+        avgLine = `原始加權 ${avg} 分（補考區）→ 補考通過，學期成績以 <b>60</b> 分計 🎓`;
+      } else {
+        res = MAKEUP_RESULT.fail;
+        avgLine = `原始加權 ${avg} 分，補考 ${state.makeupScore} 分未達 ${MAKEUP_PASS_LINE} → 重修`;
+      }
+    }
+
+    $("result-verdict").textContent = res.verdict;
+    $("result-verdict").className = "result-verdict " + res.cls;
+    $("result-scores").innerHTML = cards;
+    $("result-avg").innerHTML = avgLine;
     $("result-story").textContent = res.story;
 
     const resultImg = (res.cls === "pass" || res.cls === "warn") ? "期末考及格.png" : "期末考不及格.png";
@@ -388,10 +468,11 @@
       🧭 你的<b>每個選擇</b>都會影響「準備度」，並讓劇情走向不同分支。<br><br>
       🎒 <b>開局就拿到完整道具求生包</b>：筆記/考古題/御守(考前加分)、能量飲料/咖啡(消除疲勞)、💡公式小抄(作答時揭曉提示)。<b>每場考試最多用 2 件</b>，自己決定把好料留給哪場（期末佔比最重）。<br><br>
       😵 <b>熬夜</b>能多衝一點準備度，但會累積「疲勞」，在考試時<b>扣分</b>；能量飲料、咖啡可消除疲勞。<br><br>
-      📝 每章結尾考試 4 題，成績 ＝ 準備度 ＋ 道具加分 ＋ 答題得分 − 熬夜疲勞（上限 100）。<br><br>
+      📝 每章結尾考試 4 題，<b>從題庫隨機抽題</b>、連選項都會打亂，每次玩都不一樣。難度遞增：小考(簡單) → 期中(中等) → 期末(困難)。成績 ＝ 準備度 ＋ 道具加分 ＋ 答題得分 − 熬夜疲勞（上限 100）。<br><br>
       💾 每章結束會自動<b>存檔</b>，可從大廳繼續。<br><br>
       🎓 學期成績為<b>加權</b>：小考 20% ＋ 期中 35% ＋ 期末 45%，再判定：<br>
-      ・75↑ 順利通過　・60–74 低空飛過(預警)　・50–59 補考　・50↓ 重修
+      ・75↑ 順利通過　・60–74 低空飛過(預警)　・50–59 補考　・50↓ 重修<br><br>
+      📩 落在 <b>50–59</b> 會觸發<b>補考關卡</b>：5 題困難、每題 20 分，可用剩下的道具，達 60 分即低空通過（成績以 60 計），否則重修。
       </div>`;
     el.modal.classList.add("active");
   }
