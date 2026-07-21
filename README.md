@@ -2,7 +2,7 @@
 
 一個以「大學生修微積分」為主題的沉浸式選擇劇情 RPG 網站。
 
-**[▶ 立即遊玩](https://hsu-yu-ming.github.io/RPG-CalculusBattle) · [作品介紹與開發故事](https://cornhsu.com/luo-again.html)**
+**[▶ 立即遊玩](https://hsu-yu-ming.github.io/RPG-CalculusBattle) · [作品介紹與開發故事](https://cornhsu.com/luo-again)**
 
 ![駱是能重來的遊戲畫面](docs/screenshot.jpg)
 
