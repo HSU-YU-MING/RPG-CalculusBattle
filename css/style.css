@@ -33,7 +33,7 @@ html, body {
   align-items: center; justify-content: center;
   background:
     linear-gradient(to bottom, rgba(14,18,32,.74), rgba(14,18,32,.90)),
-    url("../image/封面.png") center / cover no-repeat,
+    url("../image/封面.webp") center / cover no-repeat,
     var(--bg);
 }
 .lobby-inner { text-align: center; max-width: 520px; padding: 24px; }

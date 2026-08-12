@@ -430,7 +430,7 @@
     $("result-avg").innerHTML = avgLine;
     $("result-story").textContent = res.story;
 
-    const resultImg = (res.cls === "pass" || res.cls === "warn") ? "期末考及格.png" : "期末考不及格.png";
+    const resultImg = (res.cls === "pass" || res.cls === "warn") ? "期末考及格.webp" : "期末考不及格.webp";
     $("result").style.backgroundImage =
       `linear-gradient(to bottom, rgba(14,18,32,.80), rgba(14,18,32,.93)), url("${encodeURI(IMG_BASE + resultImg)}")`;
 
