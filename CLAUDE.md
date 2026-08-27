@@ -48,6 +48,11 @@ GitHub（`HSU-YU-MING/RPG-CalculusBattle`）是備份不是來源。所以：
 **之後新增任何場景圖都要照做**：轉成 WebP、品質 90、沒用到透明就不留 alpha。
 這個站沒有建置步驟，沒有任何工具會幫你壓縮——手動轉好再放進 `image/`。
 
+那次轉檔漏留了 4 個沒有任何程式碼引用的舊圖（`打電動耍廢到天亮.png` 等，共約 3.95 MB），
+`deploy.ps1` 是整個資料夾複製，等於每次部署都白推一次；**已於 2026-08-27 刪除**。
+現在 `image/` 是 19 個 `.webp`、共 4.5 MB，與 `js/story.js` 的引用一一對應。
+再加圖時順手確認一下這個對應還成立——多出來的檔案不會有人提醒你。
+
 ## 資料格式的地雷
 
 `js/story.js` 是純資料（`STORY` / `ITEMS` / `QUESTION_BANK`），`js/game.js` 是引擎。
@@ -67,21 +72,6 @@ GitHub（`HSU-YU-MING/RPG-CalculusBattle`）是備份不是來源。所以：
 - 考試出題（`pickExamQuestions`）會打亂選項後用 `opts.indexOf(correctText)` 重算答案
   索引。**同一題的四個選項文字不能重複**，否則答案會指到第一個同名選項。
 - 破關（`renderEnd`）會 `removeItem(SAVE_KEY)`，這是刻意的——結算完就清檔。
-
-## 技術債留帳
-
-`image/` 底下有 **4 個沒有任何程式碼引用的舊圖**，共約 3.95 MB
-（`打電動耍廢到天亮.png` 一張就 2.5 MB，另有 `咖啡廳熬夜讀書.jpg`、
-`圖書館熬夜圖書.jpg`、`熬夜讀書.jpg`）。WebP 瘦身那次沒把它們清掉，
-而 `deploy.ps1` 是整個資料夾複製，所以**每次部署都會把這 3.95 MB 一起推上線**。
-資料夾實際 8.3 MB，比 commit 訊息宣稱的 4.4 MB 多了將近一倍。刪之前先確認沒有引用
-（`grep -rn "檔名" js/ css/ index.html`），確認過就可以刪。
-
-## 現況與 README 不符之處
-
-`README.md` 的「立即遊玩」還指向 `https://hsu-yu-ming.github.io/RPG-CalculusBattle`。
-`發表講稿.md` 第 243 行也是同一個舊網址。因為 `gh-pages` 有轉址頁所以還能用，
-但**正確網址是 `https://play.cornhsu.com/luo-again/`**。動到 README 時順手改掉。
 
 ## 開工慣例
 
